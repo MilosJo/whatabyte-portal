@@ -1,4 +1,7 @@
+# Custom added #
 node_modules
+*.env
+
 # Compiled source #
 ###################
 *.com
