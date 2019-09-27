@@ -5,6 +5,7 @@ const express = require('express');
 const expressSession = require('express-session');
 const passport = require('passport');
 const Auth0Strategy = require('passport-auth0');
+const authRouter = require('./auth');
 
 const app = express();
 const port = process.env.PORT || 8000;
@@ -50,6 +51,17 @@ app.use(expressSession(session));
 passport.use(strategy);
 app.use(passport.initialize());
 app.use(passport.session());
+
+// App and passport settings
+app.use(express.static(path.join(__dirname, 'public')));
+
+app.use((req, res, next) => {
+  res.locals.isAuthenticated = req.isAuthenticated();
+  next();
+});
+
+// Mount auth router
+app.use('/', authRouter);
 
 passport.serializeUser((user, done) => {
   done(null, user);
