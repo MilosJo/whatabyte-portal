@@ -60,6 +60,18 @@ app.use((req, res, next) => {
   next();
 });
 
+const secured = (req, res, next) => {
+  if (req.user) {
+    return next();
+  }
+  req.session.returnTo = req.originalUrl;
+  res.redirect("/login");
+};
+
+app.get("/", (req, res) => {
+  res.render("index", { title: "Home" });
+});
+
 // Mount auth router
 app.use('/', authRouter);
 
@@ -79,8 +91,12 @@ app.get('/', (req, res) => {
   res.render('index', { title: 'Home' });
 });
 
-app.get('/user', (req, res) => {
-  res.render('user', { title: 'Profile', userProfile: { nickname: 'Auth0'}});
+app.get('/user', secured, (req, res, next) => {
+  const { _raw, _json, ...userProfile } = req.user;
+  res.render('user', { 
+    title: 'Profile',
+    userProfile: userProfile
+  });
 });
 
 // App listening
